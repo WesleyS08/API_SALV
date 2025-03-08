@@ -64,7 +64,36 @@ def verificar_cartao():
     except Exception as e:
         return jsonify({"status": "error", "message": f"Erro: {str(e)}"}), 500
 
+# Rota para registrar uma entrada
+@app.route('/registro-entrada', methods=['POST'])
+def registrar_entrada():
+    data = request.get_json()
 
+    uid = data.get("uid")
+    nome_usuario = data.get("nome_usuario")
+    dispositivo_id = data.get("dispositivo_id")
+    entrada = data.get("entrada")
+
+    # Verifica se os dados essenciais estão presentes
+    if not uid or not nome_usuario or not dispositivo_id or not entrada:
+        return jsonify({"status": "error", "message": "Dados incompletos"}), 400
+
+    try:
+        # Registra uma nova entrada
+        novo_registro = {
+            "UID": uid,
+            "Nome_usuario": nome_usuario,
+            "Dispositivo_id": dispositivo_id,
+            "entrada": entrada,
+            "saida": None
+        }
+        supabase.table("TB_acessos").insert(novo_registro).execute()
+        return jsonify({"status": "success", "message": "Entrada registrada com sucesso!"})
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+# Rota para registrar uma saída
 @app.route('/registro-acesso', methods=['POST'])
 def registrar_acesso():
     data = request.get_json()
